@@ -1,131 +1,36 @@
-// Example to Send Text SMS on Button Click in React Native
-// https://aboutreact.com/send-text-sms-in-react-native/
-
-// import React in our code
-import React, { useState } from 'react';
-
-// import all the components we are going to use
-import {
-    SafeAreaView,
-    StyleSheet,
-    View,
-    Text,
-    TouchableOpacity,
-    TextInput,
-    Alert
-} from 'react-native';
-
-// import SMS API
-import SendSMS from 'react-native-sms';
-
-const Test = () => {
-    const [mobileNumber, setMobileNumber] = useState('0653299145');
-    const [bodySMS, setBodySMS] = useState(
-        'Test message',
-    );
-
-    const initiateSMS = () => {
-        // Check for perfect 10 digit length
-        if (mobileNumber.length != 10) {
-            Alert.alert('Please insert correct contact number');
-            return;
-        }
-
-        SendSMS.send(
-            {
-                // Message body
-                body: bodySMS,
-                // Recipients Number
-                recipients: [mobileNumber],
-                // An array of types 
-                // "completed" response when using android
-                successTypes: ['sent', 'queued'],
-            },
-            (completed, cancelled, error) => {
-                if (completed) {
-                    console.log('SMS Sent Completed');
-                } else if (cancelled) {
-                    console.log('SMS Sent Cancelled');
-                } else if (error) {
-                    console.log('Some error occured');
-                }
-            },
-        );
-    };
-
+import React from "react";
+import SelectDropdown from 'react-native-select-dropdown'
+import { StyleSheet, Text, View } from "react-native";
+export default function Test() {
+    const countries = ["Egypt", "Canada", "Australia", "Ireland"]
     return (
-        <SafeAreaView style={styles.container}>
-            <View style={styles.container}>
-                <Text style={styles.titleText}>
-                    Example to Send Text SMS on Button Click in React Native
-                </Text>
-                <Text style={styles.titleTextsmall}>
-                    Enter Mobile Number
-                </Text>
-                <TextInput
-                    value={mobileNumber}
-                    onChangeText={
-                        (mobileNumber) => setMobileNumber(mobileNumber)
-                    }
-                    placeholder={'Enter Conatct Number to Call'}
-                    keyboardType="numeric"
-                    style={styles.textInput}
-                />
-                <Text style={styles.titleTextsmall}>
-                    Enter SMS body
-                </Text>
-                <TextInput
-                    value={bodySMS}
-                    onChangeText={(bodySMS) => setBodySMS(bodySMS)}
-                    placeholder={'Enter SMS body'}
-                    style={styles.textInput}
-                />
-                <TouchableOpacity
-                    activeOpacity={0.7}
-                    style={styles.buttonStyle}
-                    onPress={initiateSMS}>
-                    <Text style={styles.buttonTextStyle}>
-                        Send Message
-                    </Text>
-                </TouchableOpacity>
-            </View>
-        </SafeAreaView>
+        <View style={styles.container}>
+            <Text>Hello World!</Text>
+
+            <SelectDropdown
+                data={countries}
+                onSelect={(selectedItem, index) => {
+                    console.log(selectedItem, index)
+                }}
+                buttonTextAfterSelection={(selectedItem, index) => {
+                    // text represented after item is selected
+                    // if data array is an array of objects then return selectedItem.property to render after item is selected
+                    return selectedItem
+                }}
+                rowTextForSelection={(item, index) => {
+                    // text represented for each item in dropdown
+                    // if data array is an array of objects then return item.property to represent item in dropdown
+                    return item
+                }}
+            />
+        </View>
     );
-};
-
-export default Test;
-
+}
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: 'white',
-        padding: 10,
-        textAlign: 'center',
-    },
-    titleText: {
-        fontSize: 22,
-        textAlign: 'center',
-        fontWeight: 'bold',
-    },
-    titleTextsmall: {
-        marginVertical: 8,
-        fontSize: 16,
-    },
-    buttonStyle: {
-        justifyContent: 'center',
-        marginTop: 15,
-        padding: 10,
-        backgroundColor: '#8ad24e',
-    },
-    buttonTextStyle: {
-        color: '#fff',
-        textAlign: 'center',
-    },
-    textInput: {
-        height: 40,
-        borderColor: 'gray',
-        borderWidth: 1,
-        width: '100%',
-        paddingHorizontal: 10,
+        backgroundColor: "#fff",
+        alignItems: "center",
+        justifyContent: "center",
     },
 });
