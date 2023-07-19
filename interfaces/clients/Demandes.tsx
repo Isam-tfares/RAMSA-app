@@ -10,26 +10,10 @@ import RNFetchBlob from 'rn-fetch-blob';
 
 
 const Demandes = () => {
+    const token = useSelector((state) => state.user.token);
     const client_id = useSelector((state) => state.user.userData.id);
     const demandes = useSelector((state) => state.demandes.demandes);
     const dispatch = useDispatch();
-
-    // const [refresh, setRefresh] = useState(false);
-    // const handleRefresh = () => {
-    //     setRefresh(true);
-    // };
-    // const performRefresh = () => {
-    //     // Perform the refresh logic here
-    //     fetchDemandes();
-    //     // Once the refresh is complete, set the refresh state to false
-    //     setRefresh(false);
-    // };
-
-    // useEffect(() => {
-    //     if (refresh) {
-    //         fetchDemandes();
-    //     }
-    // }, [refresh]);
 
     useEffect(() => {
         fetchDemandes();
@@ -41,6 +25,7 @@ const Demandes = () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
                 },
                 body: JSON.stringify({
                     client_id: client_id,
@@ -78,10 +63,10 @@ const Demandes = () => {
         config(options)
             .fetch('GET', url)
             .then((res) => {
-                console.log('File downloaded at:', res.path());
+                console.log('File downloaded at: ', res.path());
             })
             .catch((error) => {
-                console.log('Error downloading file:', error);
+                console.log('Error downloading file: ', error);
             });
     };
     return (

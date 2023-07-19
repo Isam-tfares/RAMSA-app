@@ -11,7 +11,6 @@
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "^1.19.0",
-    "@react-native-community/datetimepicker": "^7.4.0",
     "@react-navigation/bottom-tabs": "^6.5.8",
     "@react-navigation/native": "^6.1.7",
     "@react-navigation/native-stack": "^6.9.13",
@@ -31,6 +30,7 @@
     "react-native-select-dropdown": "^3.3.4",
     "react-native-sms": "^1.11.0",
     "react-native-table-component": "^1.2.2",
+    "react-native-ui-xg": "^0.0.6",
     "react-native-vector-icons": "^9.2.0",
     "react-redux": "^8.1.1",
     "redux": "^4.2.1",
@@ -46,6 +46,7 @@
     "@tsconfig/react-native": "^3.0.0",
     "@types/metro-config": "^0.76.3",
     "@types/react": "^18.0.24",
+    "@types/react-native-datepicker": "^1.7.1",
     "@types/react-test-renderer": "^18.0.0",
     "babel-jest": "^29.2.1",
     "eslint": "^8.19.0",

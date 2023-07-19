@@ -5,6 +5,7 @@ import { Alert } from 'react-native';
 import RNFetchBlob from 'rn-fetch-blob';
 
 export default function Contrats({ setPage }) {
+    const token = useSelector((state) => state.user.token);
     const client_id = useSelector((state) => state.user.userData.id);
     const [contrats, setContrats] = useState([]);
 
@@ -17,6 +18,7 @@ export default function Contrats({ setPage }) {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
                 },
                 body: JSON.stringify({
                     client_id: client_id,

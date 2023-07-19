@@ -83,7 +83,7 @@ function App(): JSX.Element {
               ),
               headerRight: () => (
                 <View style={styles.headerRight}>
-                  <NotificationIcon count={notificationCount} />
+                  {/* <NotificationIcon count={notificationCount} /> */}
                   <Image
                     style={styles.profileImage}
                     source={require('./assets/profile.jpg')}

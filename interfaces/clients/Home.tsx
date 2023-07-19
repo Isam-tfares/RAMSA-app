@@ -8,6 +8,7 @@ import SelectDropdown from 'react-native-select-dropdown'
 const Home = () => {
     const dispatch = useDispatch();
     const client_id = useSelector((state) => state.user.userData.id);
+    const token = useSelector((state) => state.user.token);
     const [demandesTypes, setDemandesTypes] = useState([]);
     const [isDemanderVisible, setDemanderVisible] = useState(false);
     const [demandeVisible, setDemandeVisible] = useState(null);
@@ -23,6 +24,7 @@ const Home = () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
                 },
                 body: JSON.stringify({
                     client_id: client_id,
@@ -33,10 +35,10 @@ const Home = () => {
                 const data = await response.json();
                 setContrats(data);
             } else {
-                console.log('Error:', response.status);
+                console.log('Error 1:  ', response.status);
             }
         } catch (error) {
-            console.log('Error:', error);
+            console.log('Error 2: ', error);
         }
     };
 
@@ -51,6 +53,7 @@ const Home = () => {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
                 },
             });
 
@@ -61,16 +64,22 @@ const Home = () => {
                 console.log('Error:', response.status);
             }
         } catch (error) {
-            console.log('Error:', error);
+            console.log('Error: ', error);
         }
     };
 
     const handleAddDemande = async (demandeType) => {
+        if (demandeType.historique_date && historique_date == "") {
+
+            throw new Error("Historique date is required");
+
+        }
         try {
             const response = await fetch('http://10.0.2.2/RAMSA/api/demandes.php', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
                 },
                 body: JSON.stringify({
                     client_id: client_id,
@@ -79,6 +88,7 @@ const Home = () => {
                     historique_date_debut: demandeType.historique_date_debut == 1 ? historique_date_debut : "",
                     historique_date_fin: demandeType.historique_date_fin == 1 ? historique_date_fin : "",
                     contrat_id: demandeType.contrat_id == 1 ? contratSelected : "",
+                    token: token,
                 }),
             });
 
@@ -89,7 +99,7 @@ const Home = () => {
                 console.log('Error:', response.status);
             }
         } catch (error) {
-            console.log('Error:', error);
+            console.log('Error: ', error);
         }
     };
 
@@ -122,7 +132,7 @@ const Home = () => {
                         <></>
                     )}
                     {item.historique_date_debut == 1 ? (<><TextInput
-                        placeholder="Enter Date  (Y-M-D)"
+                        placeholder="Enter Date  (Y-M-D) "
                         value={historique_date_debut}
                         onChangeText={setHistorique_date_debut}
                         placeholderTextColor='#192944'
@@ -154,7 +164,7 @@ const Home = () => {
                                 // if data array is an array of objects then return item.property to represent item in dropdown
                                 return item
                             }}
-                            defaultButtonText="Séléctionner le contrat"
+                            defaultButtonText="Séléctionner le contrat "
                             dropdownStyle={{ width: 250, marginTop: 10 }}
                             buttonStyle={{ width: 250, marginTop: 10 }}
                             buttonTextStyle={{ fontSize: 16 }}
@@ -178,7 +188,7 @@ const Home = () => {
         <>
             <View style={{ backgroundColor: '#1c4282', paddingBottom: 10 }}>
                 <Text style={styles.title}>Bienvenue à l'application RAMSA </Text>
-                <Text style={styles.description}>Vous pouvez faire une demande ici :{contratSelected}</Text>
+                <Text style={styles.description}>Vous pouvez faire une demande ici :</Text>
             </View>
             <ImageBackground source={require('../../assets/RAMSA.jpg')} style={styles.backgroundImage}>
                 <FlatList

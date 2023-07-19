@@ -8,6 +8,7 @@ import { setUserData } from '../actions/userActions';
 
 export default function UpdateInfos({ setPage }) {
     const dispatch = useDispatch();
+    const token = useSelector((state) => state.user.token);
     const client = useSelector((state) => state.user.userData);
     const [password, setPassword] = useState('')
     const [newPassword, setNewPassword] = useState('')
@@ -20,6 +21,7 @@ export default function UpdateInfos({ setPage }) {
                         method: 'PATCH',
                         headers: {
                             'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`,
                         },
                         body: JSON.stringify({
                             client_id: client.id,

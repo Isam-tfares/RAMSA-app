@@ -7,6 +7,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { setUserData } from '../actions/userActions';
 
 export default function UpdateInfos({ setPage }) {
+    const token = useSelector((state) => state.user.token);
     const client = useSelector((state) => state.user.userData);
     const [email, setEmail] = useState(client.email)
     const [nom, setNom] = useState(client.nom)
@@ -24,6 +25,7 @@ export default function UpdateInfos({ setPage }) {
                     method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
                     },
                     body: JSON.stringify({
                         client_id: client.id,
