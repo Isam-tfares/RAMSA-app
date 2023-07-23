@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert, ImageBackground, FlatList, Image, TextInput, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, ImageBackground, FlatList, Image, TextInput, SafeAreaView, Modal } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { setDemandes, addDemande } from '../../actions/demandesActions';
-import DatePicker from 'react-native-datepicker';
 import SelectDropdown from 'react-native-select-dropdown'
 
 const Home = () => {
@@ -10,13 +9,25 @@ const Home = () => {
     const client_id = useSelector((state) => state.user.userData.id);
     const token = useSelector((state) => state.user.token);
     const [demandesTypes, setDemandesTypes] = useState([]);
-    const [isDemanderVisible, setDemanderVisible] = useState(false);
     const [demandeVisible, setDemandeVisible] = useState(null);
     const [historique_date, setHistorique_date] = useState("");
     const [historique_date_debut, setHistorique_date_debut] = useState("");
     const [historique_date_fin, setHistorique_date_fin] = useState("");
     const [contrats, setContrats] = useState([]);
+    const [localites, setLocalites] = useState([]);
     const [contratSelected, setContratSelected] = useState(0);
+    const [modalVisible, setModalVisible] = useState(false);
+    const [address, setAddress] = useState('');
+    const [localite, setLocalite] = useState(1);
+    const options = ['Option 1', 'Option 2', 'Option 3'];
+    const handleSubmit = () => {
+        // Your logic to handle form submission
+        console.log('Address:', address);
+        console.log('Selected Value:', localite);
+
+        // Close the modal after form submission
+        setModalVisible(false);
+    };
 
     const fetchContrats = async () => {
         try {
@@ -41,10 +52,34 @@ const Home = () => {
             console.log('Error 2: ', error);
         }
     };
+    const fetchLocalites = async () => {
+        try {
+            const response = await fetch('http://10.0.2.2/RAMSA/api/localites.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    client_id: client_id,
+                }),
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                setLocalites(data);
+            } else {
+                console.log('Error 1:  ', response.status);
+            }
+        } catch (error) {
+            console.log('Error 2: ', error);
+        }
+    };
 
     useEffect(() => {
         fetchDemandes();
         fetchContrats();
+        fetchLocalites();
     }, []);
 
     const fetchDemandes = async () => {
@@ -64,15 +99,21 @@ const Home = () => {
                 console.log('Error:', response.status);
             }
         } catch (error) {
-            console.log('Error: ', error);
+            console.log('Error : ', error);
         }
     };
 
     const handleAddDemande = async (demandeType) => {
-        if (demandeType.historique_date && historique_date == "") {
-
-            throw new Error("Historique date is required");
-
+        if (demandeType.demande_type_id == 1) {
+            if (address.length < 3) {
+                Alert.alert('Données incompletes')
+                throw new Error("Données incompletes ");
+            }
+        } else {
+            if (contratSelected == 0) {
+                Alert.alert("Selectionner une contrat !")
+                throw new Error("Selectionner une contrat ! ");
+            }
         }
         try {
             const response = await fetch('http://10.0.2.2/RAMSA/api/demandes.php', {
@@ -84,10 +125,9 @@ const Home = () => {
                 body: JSON.stringify({
                     client_id: client_id,
                     demande_type_id: demandeType.demande_type_id,
-                    historique_date: demandeType.historique_date == 1 ? historique_date : "",
-                    historique_date_debut: demandeType.historique_date_debut == 1 ? historique_date_debut : "",
-                    historique_date_fin: demandeType.historique_date_fin == 1 ? historique_date_fin : "",
-                    contrat_id: demandeType.contrat_id == 1 ? contratSelected : "",
+                    adresse: address,
+                    localite: localite,
+                    contrat_id: contratSelected,
                     token: token,
                 }),
             });
@@ -95,6 +135,7 @@ const Home = () => {
             if (response.ok) {
                 const data = await response.text();
                 Alert.alert('Success', data);
+                setContratSelected(0);
             } else {
                 console.log('Error:', response.status);
             }
@@ -110,6 +151,12 @@ const Home = () => {
             setDemandeVisible(null)
         }
     }
+    const handleButtonClick = () => {
+        setModalVisible(true);
+    };
+    const handleButtonClose = () => {
+        setModalVisible(false);
+    };
     const renderDemandeItem = ({ item }) => (
         <View style={styles.demandeItem}>
             <View style={{ flex: 1, justifyContent: 'space-between', flexDirection: 'row' }}>
@@ -122,61 +169,77 @@ const Home = () => {
 
             {demandeVisible == item.demande_type_id ? (
                 <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                    {item.historique_date == 1 ? (<TextInput
-                        placeholder="Enter Date  (Y-M-D)"
-                        value={historique_date}
-                        onChangeText={setHistorique_date}
-                        placeholderTextColor='#192944'
-                        style={{ backgroundColor: "#edede9", color: '#192944', marginTop: 10, width: 250 }}
-                    />) : (
-                        <></>
-                    )}
-                    {item.historique_date_debut == 1 ? (<><TextInput
-                        placeholder="Enter Date  (Y-M-D) "
-                        value={historique_date_debut}
-                        onChangeText={setHistorique_date_debut}
-                        placeholderTextColor='#192944'
-                        style={{ backgroundColor: "#edede9", color: '#192944', marginTop: 10, width: 250 }}
-                    />
-                        <TextInput
-                            placeholder="Enter Date  (Y-M-D)"
-                            value={historique_date_fin}
-                            onChangeText={setHistorique_date_fin}
-                            placeholderTextColor='#192944'
-                            style={{ backgroundColor: "#edede9", color: '#192944', marginTop: 10, width: 250 }}
-                        />
-                    </>) : (
-                        <></>
-                    )}
-                    {item.contrat_id == 1 ? (
-                        <SelectDropdown
-                            data={contrats.map((item) => item.adresse_local)}
-                            onSelect={(selectedItem, index) => {
-                                setContratSelected(contrats[index].contrat_id);
-                            }}
-                            buttonTextAfterSelection={(selectedItem, index) => {
-                                // text represented after item is selected
-                                // if data array is an array of objects then return selectedItem.property to render after item is selected
-                                return selectedItem
-                            }}
-                            rowTextForSelection={(item, index) => {
-                                // text represented for each item in dropdown
-                                // if data array is an array of objects then return item.property to represent item in dropdown
-                                return item
-                            }}
-                            defaultButtonText="Séléctionner le contrat "
-                            dropdownStyle={{ width: 250, marginTop: 10 }}
-                            buttonStyle={{ width: 250, marginTop: 10 }}
-                            buttonTextStyle={{ fontSize: 16 }}
-                            rowTextStyle={{ fontSize: 16 }}
-                        />
-                    ) : (
-                        <></>
+                    {item.demande_type_id == 1 ? (
+                        <View>
+                            <TouchableOpacity style={styles.demanderButton} onPress={handleButtonClick}>
+                                <Text style={styles.demanderButtonText}>Demander</Text>
+                            </TouchableOpacity>
+                            <Modal visible={modalVisible} animationType="slide">
+                                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                                    <View style={{ backgroundColor: 'white', padding: 20, borderRadius: 10 }}>
+                                        {/* Address TextInput */}
+                                        <TextInput
+                                            placeholder="Entrer l'adresse locale"
+                                            value={address}
+                                            onChangeText={setAddress}
+                                            style={{ borderBottomWidth: 1, marginBottom: 10 }}
+                                        />
+
+                                        <SelectDropdown
+                                            data={localites.map((item) => item.localite_name)}
+                                            onSelect={(selectedItem, index) => {
+                                                setLocalite(localites[index].localite_id);
+                                            }}
+                                            buttonTextAfterSelection={(selectedItem, index) => {
+                                                return selectedItem
+                                            }}
+                                            rowTextForSelection={(item, index) => {
+                                                return item
+                                            }}
+                                            defaultValueByIndex={0}
+                                            defaultButtonText="Séléctionner le contrat "
+                                            dropdownStyle={{ width: 250, marginTop: 10 }}
+                                            buttonStyle={{ width: 250, marginTop: 10 }}
+                                            buttonTextStyle={{ fontSize: 16 }}
+                                            rowTextStyle={{ fontSize: 16 }}
+                                        />
+
+                                        {/* Submit Button */}
+                                        <TouchableOpacity onPress={() => handleAddDemande(item)} style={{ backgroundColor: '#1c488c', padding: 10, borderRadius: 5, marginTop: 20 }}>
+                                            <Text style={{ color: 'white', textAlign: 'center' }}>Demander</Text>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity style={styles.demanderButton} onPress={handleButtonClose}>
+                                            <Text style={styles.demanderButtonText}>Close </Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                </View>
+                            </Modal>
+                        </View>) : (
+                        (
+                            <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}><SelectDropdown
+                                data={contrats.map((item) => item.adresse_local)}
+                                onSelect={(selectedItem, index) => {
+                                    setContratSelected(contrats[index].contrat_id);
+                                }}
+                                buttonTextAfterSelection={(selectedItem, index) => {
+                                    return selectedItem
+                                }}
+                                rowTextForSelection={(item, index) => {
+                                    return item
+                                }}
+                                defaultButtonText="Séléctionner le contrat "
+                                dropdownStyle={{ width: 250, marginTop: 10 }}
+                                buttonStyle={{ width: 250, marginTop: 10 }}
+                                buttonTextStyle={{ fontSize: 16 }}
+                                rowTextStyle={{ fontSize: 16 }}
+                            />
+                                <TouchableOpacity style={styles.demanderButton} onPress={() => handleAddDemande(item)}>
+                                    <Text style={styles.demanderButtonText}>Demander</Text>
+                                </TouchableOpacity>
+                            </View>
+                        )
                     )}
 
-                    <TouchableOpacity style={styles.demanderButton} onPress={() => handleAddDemande(item)}>
-                        <Text style={styles.demanderButtonText}>Demander</Text>
-                    </TouchableOpacity>
                 </View>
 
             ) : <></>}

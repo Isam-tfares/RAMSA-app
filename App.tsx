@@ -18,7 +18,7 @@ import Profile from './interfaces/clients/Profile';
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import Test from './interfaces/clients/Test';
+import Factures from './interfaces/clients/Factures';
 
 function NotificationIcon({ count }) {
   return (
@@ -133,20 +133,20 @@ function App(): JSX.Element {
               }}
             />
             <Tab.Screen
-              name="Test"
-              component={Test}
+              name="Factures"
+              component={Factures}
               options={{
-                title: 'Test',
+                title: 'Factures',
                 tabBarIcon: ({ size, focused, color }) => {
                   return focused ? (
                     <Image
-                      style={{ width: 30, height: 30 }}
-                      source={require('./assets/list.png')}
+                      style={{ width: 25, height: 25 }}
+                      source={require('./assets/factures.png')}
                     />
                   ) : (
                     <Image
-                      style={{ width: 25, height: 25 }}
-                      source={require('./assets/list-outline.png')}
+                      style={{ width: 30, height: 30 }}
+                      source={require('./assets/factures-outline.png')}
                     />
                   );
                 },

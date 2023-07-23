@@ -1,23 +1,37 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Button, Alert, Image, Platform, PermissionsAndroid, } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Button, Alert, Image, Platform, PermissionsAndroid, Modal, ScrollView } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { setDemandes } from '../../actions/demandesActions';
 // Import RNFetchBlob for the file download
 import RNFetchBlob from 'rn-fetch-blob';
+import Encaissements from '../../Components/Encaissements';
+import Consommations from '../../Components/Consommations';
+import Contrat from '../../Components/Contrat';
 
-
-
-
+const genereteKey = () => {
+    return Math.floor(Math.random() * (1000000));
+}
 
 const Demandes = () => {
     const token = useSelector((state) => state.user.token);
     const client_id = useSelector((state) => state.user.userData.id);
     const demandes = useSelector((state) => state.demandes.demandes);
     const dispatch = useDispatch();
+    const [modalVisible, setModalVisible] = useState(false);
+    const [demandeSelected, setDemandeSelected] = useState(null);
+    const [data, setData] = useState([]);
+    const [page, setPage] = useState(0);
+    const handleButtonClick = () => {
+        setModalVisible(true);
+    };
+    const handleButtonClose = () => {
+        setModalVisible(false);
+        setDemandeSelected(null);
+    };
 
     useEffect(() => {
         fetchDemandes();
-    });
+    }, []);
 
     const fetchDemandes = async () => {
         try {
@@ -69,54 +83,100 @@ const Demandes = () => {
                 console.log('Error downloading file: ', error);
             });
     };
-    return (
-        <View style={styles.container}>
-            <View style={styles.wrapper}>
-                <Text style={styles.title}>Vos Demandes</Text>
-
-                {/* <Button title="Refresh" onPress={handleRefresh} /> */}
-                {demandes.length > 0 ? (
-                    <View style={styles.table}>
-                        <View style={styles.table_head}>
-                            <View style={{ width: '40%' }}>
-                                <Text style={styles.table_head_captions}>Type du demande</Text>
-                            </View>
-                            <View style={{ width: '30%' }}>
-                                <Text style={styles.table_head_captions}>Etat</Text>
-                            </View>
-                            <View style={{ width: '30%' }}>
-                                <Text style={styles.table_head_captions}>Action</Text>
-                            </View>
-                        </View>
-
-                        {demandes.map((demande) => (
-                            <View style={styles.table_body_single_row} key={demande.demande_id}>
+    const openModalAndFetchData = async (demande) => {
+        let url = '';
+        switch (demande.demande_type_id) {
+            case 3:
+                url = 'http://10.0.2.2/RAMSA/api/encaissements.php';
+                break;
+            case 4:
+                url = 'http://10.0.2.2/RAMSA/api/consommations.php'
+                break;
+            case 5:
+                url = 'http://10.0.2.2/RAMSA/api/contrats.php'
+                break;
+        }
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    client_id: client_id,
+                    contrat_id: demande.contrat_id,
+                }),
+            });
+            if (response.ok) {
+                const donnees = await response.json();
+                setData(donnees);
+            } else {
+                console.log('Error:', response.status);
+            }
+        } catch (error) {
+            console.log('Error:', error);
+        }
+        setPage(demande.demande_type_id);
+    }
+    if (page == 3) {
+        return (<Encaissements setPage={setPage} data={data} />)
+    } else if (page == 4) {
+        return (<Consommations setPage={setPage} data={data} />)
+    } else if (page == 5) {
+        return (<Contrat setPage={setPage} data={data} />)
+    } else {
+        return (
+            <View style={styles.container}>
+                <View style={styles.wrapper}>
+                    <Text style={styles.title}>Vos Demandes</Text>
+                    {demandes.length > 0 ? (
+                        <View style={styles.table}>
+                            <View style={styles.table_head}>
                                 <View style={{ width: '40%' }}>
-                                    <Text style={styles.table_data}>{demande.demande_name}</Text>
+                                    <Text style={styles.table_head_captions}>Type du demande</Text>
                                 </View>
                                 <View style={{ width: '30%' }}>
-                                    <Text style={styles.table_data}>{demande.etat === 0 ? 'NonTraité' : 'Traité'}</Text>
+                                    <Text style={styles.table_head_captions}>Etat</Text>
                                 </View>
                                 <View style={{ width: '30%' }}>
-                                    <Text style={styles.table_data}>
-                                        {demande.etat == 0 ? (
-                                            <View style={styles.disabled_button}>
-                                                <Text style={{ color: 'white' }}>Télécharger</Text>
-                                            </View>
-                                        ) : (
-                                            <TouchableOpacity style={{ padding: 5, backgroundColor: '#1c488c' }} onPress={() => download(demande)} ><Text style={{ color: 'white' }}>Télécharger</Text></TouchableOpacity>
-                                        )}
-                                    </Text>
+                                    <Text style={styles.table_head_captions}>Action</Text>
                                 </View>
                             </View>
-                        ))}
-                    </View>
-                ) : (
-                    <Text>Il n'y a aucune demande</Text>
-                )}
+
+                            {demandes.map((demande) => (
+                                <View style={styles.table_body_single_row} key={genereteKey()}>
+                                    <View style={{ width: '40%' }}>
+                                        <Text style={styles.table_data}>{demande.demande_name}</Text>
+                                    </View>
+                                    <View style={{ width: '30%' }}>
+                                        <Text style={styles.table_data}>{demande.etat === 0 ? 'NonTraité' : 'Traité'}</Text>
+                                    </View>
+                                    <View style={{ width: '30%' }}>
+                                        {((demande.demande_type_id == 1 || demande.demande_type_id == 2)) ? (
+                                            <View style={{ padding: 10 }}></View>
+                                        ) : (<Text style={styles.table_data}>
+                                            {demande.etat == 0 ? (
+                                                <View style={styles.disabled_button}>
+                                                    <Text style={{ color: 'white' }}>Voir</Text>
+                                                </View>
+                                            ) : (
+                                                <TouchableOpacity style={{ padding: 5, backgroundColor: '#1c488c', paddingHorizontal: 20 }} onPress={() => openModalAndFetchData(demande)} ><Text style={{ color: 'white' }}>Voir</Text></TouchableOpacity>
+                                            )}
+                                        </Text>)}
+
+                                    </View>
+                                </View>
+                            ))}
+                        </View>
+                    ) : (
+                        <Text>Il n'y a aucune demande</Text>
+                    )}
+                </View>
             </View>
-        </View>
-    );
+        );
+    }
+
 };
 
 const styles = StyleSheet.create({
@@ -124,6 +184,10 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    scrollView: {
+        flex: 1,
+        maxHeight: 400, // Set a maximum height to the ScrollView so it becomes scrollable
     },
     title: {
         fontSize: 25,
@@ -161,17 +225,28 @@ const styles = StyleSheet.create({
         padding: 7,
     },
     table_data: {
-        fontSize: 11,
+        fontSize: 15,
         fontWeight: 'bold',
     },
     disabled_button: {
         opacity: 0.5,
         backgroundColor: '#1c488c',
         padding: 5,
+        paddingHorizontal: 20,
     },
     enabled_button: {
         backgroundColor: '#1c488c',
         padding: 5,
+    },
+    graph: {
+        padding: 20,
+        backgroundColor: '#f0f0f0',
+        borderRadius: 10,
+    },
+    graphTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        marginBottom: 10,
     },
 });
 
