@@ -3,21 +3,12 @@ import { View, Button, TextInput, Modal, TouchableOpacity, Text, StyleSheet } fr
 import { useSelector } from 'react-redux';
 
 const Factures = () => {
-    const [content, setContent] = useState(1);
+    const [content, setContent] = useState(2);
     const [facturesArchives, setFacturesArchives] = useState([]);
     const [factures, setFactures] = useState([]);
     const token = useSelector((state) => state.user.token);
     const client_id = useSelector((state) => state.user.userData.id);
     const months = ['', 'Janvier', 'Fevrier', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Aout', 'Septembre', 'Octobre', 'Novembre', 'Decembre'];
-    const aPayer = [{
-        facture_id: 1,
-        montant: 199,
-        consommation_mois: 5
-    }, {
-        facture_id: 2,
-        montant: 176,
-        consommation_mois: 6
-    }]
     useEffect(() => {
         fetchFacturesA();
         fetchFactures();

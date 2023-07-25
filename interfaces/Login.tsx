@@ -33,14 +33,10 @@ const Login = ({ isLogined, setLogined }) => {
                     .then((response) => {
                         if (response.message === 'Connected') {
                             const { token } = response;
-
-                            // Save the token in Redux
                             dispatch(setToken(token));
-
                             const userData = response.user;
+                            userData.password = password;
                             dispatch(setUserData(userData));
-
-                            // Set the login status
                             setLogined(true);
                         } else {
                             Alert.alert(response.message);
