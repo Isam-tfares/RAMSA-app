@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Button, TextInput, Modal, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { useSelector } from 'react-redux';
 
 const Factures = () => {
@@ -99,7 +99,7 @@ const Factures = () => {
                                         <Text style={styles.facture_date}>{months[item.consommation_mois]} 2023</Text>
                                         <View style={{ display: 'flex', flexDirection: 'row', marginTop: 5, marginLeft: 3 }}>
                                             <Text style={{ marginLeft: 3, fontSize: 13 }}>Dernier delai pour payement </Text>
-                                            <Text style={styles.paement_date}>10 {new Date(item.facture_time).toLocaleDateString("fr-FR", { month: "long" })}</Text>
+                                            <Text style={styles.paement_date}>10 {new Date(item.facture_time).toLocaleDateString("fr-FR", { month: "long" })} </Text>
                                         </View>
 
                                     </View>

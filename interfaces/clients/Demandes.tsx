@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Button, Alert, Image, Platform, PermissionsAndroid, Modal, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { setDemandes } from '../../actions/demandesActions';
 // Import RNFetchBlob for the file download
@@ -17,17 +17,9 @@ const Demandes = () => {
     const client_id = useSelector((state) => state.user.userData.id);
     const demandes = useSelector((state) => state.demandes.demandes);
     const dispatch = useDispatch();
-    const [modalVisible, setModalVisible] = useState(false);
-    const [demandeSelected, setDemandeSelected] = useState(null);
     const [data, setData] = useState([]);
     const [page, setPage] = useState(0);
-    const handleButtonClick = () => {
-        setModalVisible(true);
-    };
-    const handleButtonClose = () => {
-        setModalVisible(false);
-        setDemandeSelected(null);
-    };
+    const [demandeSelected, setDemandeSelected] = useState(0);
 
     useEffect(() => {
         fetchDemandes();
@@ -118,13 +110,14 @@ const Demandes = () => {
             console.log('Error:', error);
         }
         setPage(demande.demande_type_id);
+        setDemandeSelected(demande);
     }
     if (page == 3) {
-        return (<Encaissements setPage={setPage} data={data} />)
+        return (<Encaissements setPage={setPage} data={data} demandeSelected={demandeSelected} />)
     } else if (page == 4) {
-        return (<Consommations setPage={setPage} data={data} />)
+        return (<Consommations setPage={setPage} data={data} demandeSelected={demandeSelected} />)
     } else if (page == 5) {
-        return (<Contrat setPage={setPage} data={data} />)
+        return (<Contrat setPage={setPage} data={data} demandeSelected={demandeSelected} />)
     } else {
         return (
             <View style={styles.container}>
@@ -233,20 +226,6 @@ const styles = StyleSheet.create({
         backgroundColor: '#1c488c',
         padding: 5,
         paddingHorizontal: 20,
-    },
-    enabled_button: {
-        backgroundColor: '#1c488c',
-        padding: 5,
-    },
-    graph: {
-        padding: 20,
-        backgroundColor: '#f0f0f0',
-        borderRadius: 10,
-    },
-    graphTitle: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        marginBottom: 10,
     },
 });
 

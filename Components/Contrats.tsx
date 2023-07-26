@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import { Alert } from 'react-native';
 import RNFetchBlob from 'rn-fetch-blob';
 
-export default function Contrats({ setPage }) {
+export default function Contrats({ setPage, demandeSelected }) {
     const token = useSelector((state) => state.user.token);
     const client_id = useSelector((state) => state.user.userData.id);
     const [contrats, setContrats] = useState([]);

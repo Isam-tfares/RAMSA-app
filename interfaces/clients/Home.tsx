@@ -1,33 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, ImageBackground, FlatList, Image, TextInput, SafeAreaView, Modal } from 'react-native';
-import { useDispatch, useSelector } from 'react-redux';
-import { setDemandes, addDemande } from '../../actions/demandesActions';
+import { useSelector } from 'react-redux';
 import SelectDropdown from 'react-native-select-dropdown'
 
 const Home = () => {
-    const dispatch = useDispatch();
     const client_id = useSelector((state) => state.user.userData.id);
     const token = useSelector((state) => state.user.token);
     const [demandesTypes, setDemandesTypes] = useState([]);
     const [demandeVisible, setDemandeVisible] = useState(null);
-    const [historique_date, setHistorique_date] = useState("");
-    const [historique_date_debut, setHistorique_date_debut] = useState("");
-    const [historique_date_fin, setHistorique_date_fin] = useState("");
     const [contrats, setContrats] = useState([]);
     const [localites, setLocalites] = useState([]);
     const [contratSelected, setContratSelected] = useState(0);
     const [modalVisible, setModalVisible] = useState(false);
     const [address, setAddress] = useState('');
     const [localite, setLocalite] = useState(1);
-    const options = ['Option 1', 'Option 2', 'Option 3'];
-    const handleSubmit = () => {
-        // Your logic to handle form submission
-        console.log('Address:', address);
-        console.log('Selected Value:', localite);
-
-        // Close the modal after form submission
-        setModalVisible(false);
-    };
 
     const fetchContrats = async () => {
         try {
@@ -320,15 +306,6 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontWeight: 'bold',
         fontSize: 18,
-    },
-    notificationIcon: {
-        position: 'absolute',
-        top: 20,
-        right: 20,
-    },
-    notificationImage: {
-        width: 25,
-        height: 25,
     },
 });
 

@@ -6,9 +6,9 @@ import RNFetchBlob from 'rn-fetch-blob';
 const genereteKey = () => {
     return Math.floor(Math.random() * (1000000));
 }
-const Encaissements = ({ setPage, data }) => {
-    const download = (demande) => {
-        const url = 'http://10.0.2.2/RAMSA/assets/demandes/' + demande.file_path;
+const Encaissements = ({ setPage, data, demandeSelected }) => {
+    const download = () => {
+        const url = 'http://10.0.2.2/RAMSA/assets/Demandes/' + demandeSelected.file_path;
         const { config, fs } = RNFetchBlob;
         const downloadDir = fs.dirs.DownloadDir;
 
@@ -43,7 +43,11 @@ const Encaissements = ({ setPage, data }) => {
                 />
             </TouchableOpacity>
             <View style={styles.wrapper}>
+
                 <Text style={styles.title}>Historique des encaissements</Text>
+                <TouchableOpacity onPress={() => { download() }} style={{ backgroundColor: '#1c488c', padding: 10, marginTop: 10, paddingHorizontal: 20, }}>
+                    <Text style={{ color: 'white', fontWeight: 'bold' }}>Télécharger</Text>
+                </TouchableOpacity>
                 <ScrollView horizontal style={styles.scrollView}>
 
                     <View style={styles.table}>
